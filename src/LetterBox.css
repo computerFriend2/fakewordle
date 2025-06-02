@@ -16,3 +16,13 @@
 .letterGrid {
     border: 0px 2px solid #888;
 }
+
+/* styling TODO: add extra border for first and last letters */
+
+/* TODO: move to another stylesheet? too much in one file */
+
+.errorText {
+    /* TODO: test color in light/dark mode, HC */
+    color: red;
+    padding: 0.5em;
+}
