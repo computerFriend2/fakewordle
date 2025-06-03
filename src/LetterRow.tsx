@@ -26,9 +26,12 @@ const LetterRow: React.FC = () => {
     const [wordError, setWordError] = useState<string>('');
     const [hasError, setHasError] = useState<boolean>(false);
 
-    const updateWord = (firstLetter: string, secondLetter: string, thirdLetter: string, fourthLetter: string, fifthLetter: string): void => {
+    const updateWord = (letter: string, position: number): void => {
         // TODO: account for empty letter boxes
-        const newWord = (firstLetter + secondLetter + thirdLetter + fourthLetter + fifthLetter).toLocaleUpperCase();
+        const wordLetters = word.split('');
+        wordLetters[position] = letter;
+        const newWord = wordLetters.join('');
+
         console.log(`new word is ${newWord}`);
         setWord(newWord);
     }
@@ -37,24 +40,24 @@ const LetterRow: React.FC = () => {
 
     const updateFirstLetter = (letter: string): void => {
         setFirstLetter(letter);
-        updateWord(letter, secondLetter, thirdLetter, fourthLetter, fifthLetter);
+        updateWord(letter, 0);
     }
     const updateSecondLetter = (letter: string): void => {
         setSecondLetter(letter);
-        updateWord(firstLetter, letter, thirdLetter, fourthLetter, fifthLetter);
+        updateWord(letter, 1);
     }
     const updateThirdLetter = (letter: string): void => {
         setThirdLetter(letter);
-        updateWord(firstLetter, secondLetter, letter, fourthLetter, fifthLetter);
+        updateWord(letter, 2);
     }
     const updateFourthLetter = (letter: string): void => {
         setFourthLetter(letter);
-        updateWord(firstLetter, secondLetter, thirdLetter, letter, fifthLetter);
+        updateWord(letter, 3);
 
     }
     const updateFifthLetter = (letter: string): void => {
         setFifthLetter(letter);
-        updateWord(firstLetter, secondLetter, thirdLetter, fourthLetter, letter);
+        updateWord(letter, 4);
     }
 
     // TODO: move to a control component / different file
@@ -84,7 +87,6 @@ const LetterRow: React.FC = () => {
                 <LetterBox letter={fourthLetter} updateLetter={updateFourthLetter}></LetterBox>
                 <LetterBox letter={fifthLetter} updateLetter={updateFifthLetter}></LetterBox>
             </div>
-            {/* TODO: update hasError to 'false' when a neww guess is sent */}
             {hasError == true ? <div className='errorText'>{wordError}</div> : ''}
 
         </div >;
