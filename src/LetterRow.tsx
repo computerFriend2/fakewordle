@@ -15,46 +15,18 @@ const LetterRow: React.FC = () => {
 
     const [letters, setLetters] = useState<string[]>([]);
 
-    const [firstLetter, setFirstLetter] = useState<string>('');
-    const [secondLetter, setSecondLetter] = useState<string>('');
-    const [thirdLetter, setThirdLetter] = useState<string>('');
-    const [fourthLetter, setFourthLetter] = useState<string>('');
-    const [fifthLetter, setFifthLetter] = useState<string>('');
-
     const [word, setWord] = useState('');
 
     const [wordError, setWordError] = useState<string>('');
     const [hasError, setHasError] = useState<boolean>(false);
 
-    const updateWord = (firstLetter: string, secondLetter: string, thirdLetter: string, fourthLetter: string, fifthLetter: string): void => {
-        // TODO: account for empty letter boxes
-        const newWord = (firstLetter + secondLetter + thirdLetter + fourthLetter + fifthLetter).toLocaleUpperCase();
-        console.log(`new word is ${newWord}`);
-        setWord(newWord);
-    }
 
-    // TODO: find a way to combine all letterboxes into text, using CSS magic to make grid - bc this current approach is really inefficient
-
-    const updateFirstLetter = (letter: string): void => {
-        setFirstLetter(letter);
-        updateWord(letter, secondLetter, thirdLetter, fourthLetter, fifthLetter);
-    }
-    const updateSecondLetter = (letter: string): void => {
-        setSecondLetter(letter);
-        updateWord(firstLetter, letter, thirdLetter, fourthLetter, fifthLetter);
-    }
-    const updateThirdLetter = (letter: string): void => {
-        setThirdLetter(letter);
-        updateWord(firstLetter, secondLetter, letter, fourthLetter, fifthLetter);
-    }
-    const updateFourthLetter = (letter: string): void => {
-        setFourthLetter(letter);
-        updateWord(firstLetter, secondLetter, thirdLetter, letter, fifthLetter);
-
-    }
-    const updateFifthLetter = (letter: string): void => {
-        setFifthLetter(letter);
-        updateWord(firstLetter, secondLetter, thirdLetter, fourthLetter, letter);
+    const updateLetters = (letter: string, position: number): void => {
+        const newLetters: string[] = letters;
+        newLetters[position] = letter;
+        setLetters(newLetters);
+        // const newWord = newLetters.join('').toLocaleUpperCase();
+        // setWord(newWord);
     }
 
     // TODO: move to a control component / different file
@@ -77,11 +49,8 @@ const LetterRow: React.FC = () => {
     const letterRow =
         <div>
             <div onKeyDown={keyDownHandler}>
-                <LetterBox letter={firstLetter} updateLetter={updateFirstLetter}></LetterBox>
-                <LetterBox letter={secondLetter} updateLetter={updateSecondLetter}></LetterBox>
-                <LetterBox letter={thirdLetter} updateLetter={updateThirdLetter}></LetterBox>
-                <LetterBox letter={fourthLetter} updateLetter={updateFourthLetter}></LetterBox>
-                <LetterBox letter={fifthLetter} updateLetter={updateFifthLetter}></LetterBox>
+                {/* TODO: make it a loop; change hard-coded positions to indexex */}
+                <LetterBox letter={letters[0]} position={0} updateLetter={updateLetters(letters[0], 0)}></LetterBox>
             </div>
             {hasError ?? <div className='errorText'>{wordError}</div>}
 
