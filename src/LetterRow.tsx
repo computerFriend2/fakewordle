@@ -62,8 +62,9 @@ const LetterRow: React.FC = () => {
         if (word.length < WORD_LENGTH) {
             setWordError('Not enough letters');
             setHasError(true);
+        } else {
+            setHasError(false);
         }
-
         console.log(`guessed: \'${word}\'`);
     }
 
@@ -83,7 +84,8 @@ const LetterRow: React.FC = () => {
                 <LetterBox letter={fourthLetter} updateLetter={updateFourthLetter}></LetterBox>
                 <LetterBox letter={fifthLetter} updateLetter={updateFifthLetter}></LetterBox>
             </div>
-            {hasError ?? <div className='errorText'>{wordError}</div>}
+            {/* TODO: update hasError to 'false' when a neww guess is sent */}
+            {hasError == true ? <div className='errorText'>{wordError}</div> : ''}
 
         </div >;
 
