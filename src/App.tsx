@@ -1,5 +1,6 @@
 import bulbasaurLogo from '/bulbasaur.svg'
-import LetterRow from './LetterRow'
+import WordGrid from './WordGrid'
+
 
 import './App.css'
 
@@ -13,7 +14,7 @@ function App() {
       <h1>Fake Wordle</h1>
       <div>
         <p>Input 5-letter word guesses until you guess the secret word!</p>
-        <LetterRow />
+        <WordGrid />
       </div>
       <p className="read-the-docs">
         It's not the real wordle. Don't sue me.

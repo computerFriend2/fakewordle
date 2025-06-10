@@ -1,19 +1,16 @@
-// row of letterboxes
-// disable input after guess is sent
-// auto-tab to the next box
-
-// can probably store LetterBox and LetterRow in WordGrid... eventually
+// TODO: disable input after guess is sent
+// TODO: auto-focus to the next box after inputting letter
+// TODO: enable backspace (would seriously be easier to just use a text input...)
 
 import { useState } from "react";
 import LetterBox from "./LetterBox";
+import FiveLetterWords from "./word-lists/FiveLetters";
 
 
 const LetterRow: React.FC = () => {
 
     // NOTE: this will be helpful when making the length dynamic, and also making the letter boxes dynamic vs. explicit definitions
     const WORD_LENGTH = 5;
-
-    const [letters, setLetters] = useState<string[]>([]);
 
     const [firstLetter, setFirstLetter] = useState<string>('');
     const [secondLetter, setSecondLetter] = useState<string>('');
@@ -22,6 +19,7 @@ const LetterRow: React.FC = () => {
     const [fifthLetter, setFifthLetter] = useState<string>('');
 
     const [word, setWord] = useState('');
+    const [locked, setLocked] = useState<boolean>(false);
 
     const [wordError, setWordError] = useState<string>('');
     const [hasError, setHasError] = useState<boolean>(false);
@@ -36,7 +34,7 @@ const LetterRow: React.FC = () => {
         setWord(newWord);
     }
 
-    // TODO: find a way to combine all letterboxes into text, using CSS magic to make grid - bc this current approach is really inefficient
+    // TODO: find a way to combine all letterboxes into one textbox input, using CSS magic to make grid appearance - bc this current approach is really inefficient
 
     const updateFirstLetter = (letter: string): void => {
         setFirstLetter(letter);
@@ -60,15 +58,44 @@ const LetterRow: React.FC = () => {
         updateWord(letter, 4);
     }
 
-    // TODO: move to a control component / different file
-    function submitGuess(word: string): void {
+    function validateGuess(word: string): boolean {
+        console.log("Validating guess...");
         if (word.length < WORD_LENGTH) {
             setWordError('Not enough letters');
             setHasError(true);
-        } else {
+            return false;
+        } else if (!FiveLetterWords.includes(word)) {
+            setWordError('Not found in word list');
+            setHasError(true);
+            return false;
+        } else { // valid guess
+            console.log("guess is OK");
             setHasError(false);
+            // evaluate guess
+            return true;
         }
+    }
+
+    function analyzeGuess(word: string): void {
+        console.log(`Analyzing guess for word \"${word}\"...`);
+    }
+
+    // TODO: move to a control component / different file
+    function submitGuess(word: string): void {
+        const isValid: boolean = validateGuess(word);
+        if (isValid) {
+            // if a valid guess is submitted, lock the input and analyze the guess
+            setLocked(true);
+            analyzeGuess(word);
+        };
+
         console.log(`guessed: \'${word}\'`);
+
+        // check to see if word is the answer
+
+        // check to see colors for letters
+
+        // add new row
     }
 
     function keyDownHandler(event: React.KeyboardEvent<HTMLInputElement>): void {
@@ -77,6 +104,8 @@ const LetterRow: React.FC = () => {
         }
         return;
     }
+
+    // TODO: disable input if 'locked' is true
 
     const letterRow =
         <div>
