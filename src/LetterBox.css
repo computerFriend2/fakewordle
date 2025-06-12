@@ -18,3 +18,11 @@
     color: red;
     padding: 0.5em;
 }
+
+.wrongSpot {
+    background-color: yellow;
+}
+
+.correct {
+    background-color: green;
+}
