@@ -5,9 +5,12 @@
 import { useState } from "react";
 import LetterBox from "./LetterBox";
 import FiveLetterWords from "./word-lists/FiveLetters";
+import evaluateGuess from "./guessEval";
 
-
-const LetterRow: React.FC = () => {
+interface LetterRowProps {
+    secretWord: string
+}
+const LetterRow: React.FC<LetterRowProps> = ({ secretWord }: LetterRowProps) => {
 
     // NOTE: this will be helpful when making the length dynamic, and also making the letter boxes dynamic vs. explicit definitions
     const WORD_LENGTH = 5;
@@ -24,6 +27,8 @@ const LetterRow: React.FC = () => {
     const [wordError, setWordError] = useState<string>('');
     const [hasError, setHasError] = useState<boolean>(false);
 
+    const [letterStati, setLetterStati] = useState<string[]>([''])
+
     const updateWord = (letter: string, position: number): void => {
         // TODO: account for empty letter boxes
         const wordLetters = word.split('');
@@ -35,7 +40,6 @@ const LetterRow: React.FC = () => {
     }
 
     // TODO: find a way to combine all letterboxes into one textbox input, using CSS magic to make grid appearance - bc this current approach is really inefficient
-
     const updateFirstLetter = (letter: string): void => {
         setFirstLetter(letter);
         updateWord(letter, 0);
@@ -64,21 +68,18 @@ const LetterRow: React.FC = () => {
             setWordError('Not enough letters');
             setHasError(true);
             return false;
-        } else if (!FiveLetterWords.includes(word)) {
-            setWordError('Not found in word list');
-            setHasError(true);
-            return false;
+            // re-add word validation when I have a better word list or a better way of checking
+            // } else if (!FiveLetterWords.includes(word)) {
+            //     setWordError('Not found in word list');
+            //     setHasError(true);
+            //     return false;
         } else { // valid guess
-            console.log("guess is OK");
             setHasError(false);
             // evaluate guess
             return true;
         }
     }
 
-    function analyzeGuess(word: string): void {
-        console.log(`Analyzing guess for word \"${word}\"...`);
-    }
 
     // TODO: move to a control component / different file
     function submitGuess(word: string): void {
@@ -86,7 +87,7 @@ const LetterRow: React.FC = () => {
         if (isValid) {
             // if a valid guess is submitted, lock the input and analyze the guess
             setLocked(true);
-            analyzeGuess(word);
+            setLetterStati(evaluateGuess(word, secretWord));
         };
 
         console.log(`guessed: \'${word}\'`);
@@ -105,16 +106,14 @@ const LetterRow: React.FC = () => {
         return;
     }
 
-    // TODO: disable input if 'locked' is true
-
     const letterRow =
         <div>
             <div onKeyDown={keyDownHandler}>
-                <LetterBox letter={firstLetter} updateLetter={updateFirstLetter}></LetterBox>
-                <LetterBox letter={secondLetter} updateLetter={updateSecondLetter}></LetterBox>
-                <LetterBox letter={thirdLetter} updateLetter={updateThirdLetter}></LetterBox>
-                <LetterBox letter={fourthLetter} updateLetter={updateFourthLetter}></LetterBox>
-                <LetterBox letter={fifthLetter} updateLetter={updateFifthLetter}></LetterBox>
+                <LetterBox letter={firstLetter} updateLetter={updateFirstLetter} locked={locked} letterStatus={letterStati[0]}></LetterBox>
+                <LetterBox letter={secondLetter} updateLetter={updateSecondLetter} locked={locked} letterStatus={letterStati[1]}></LetterBox>
+                <LetterBox letter={thirdLetter} updateLetter={updateThirdLetter} locked={locked} letterStatus={letterStati[2]}></LetterBox>
+                <LetterBox letter={fourthLetter} updateLetter={updateFourthLetter} locked={locked} letterStatus={letterStati[3]}></LetterBox>
+                <LetterBox letter={fifthLetter} updateLetter={updateFifthLetter} locked={locked} letterStatus={letterStati[4]}></LetterBox>
             </div>
             {hasError == true ? <div className='errorText'>{wordError}</div> : ''}
 

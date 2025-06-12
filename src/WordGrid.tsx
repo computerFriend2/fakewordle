@@ -1,15 +1,18 @@
 import LetterRow from './LetterRow'
+import chooseSecretWord from './WordGrid';
 
-// TODO: find a way to update locked boxes without infinite state updates... might need to manage locked state from this level?
+const secretWord = chooseSecretWord();
+
+// TODO: make number of allowed guesses dynamic
 
 const WordGrid: React.FC = () => {
     return <div className='wordGrid'>
-        <LetterRow />
-        <LetterRow />
-        <LetterRow />
-        <LetterRow />
-        <LetterRow />
-        <LetterRow />
+        <LetterRow secretWord={secretWord} />
+        <LetterRow secretWord={secretWord} />
+        <LetterRow secretWord={secretWord} />
+        <LetterRow secretWord={secretWord} />
+        <LetterRow secretWord={secretWord} />
+        <LetterRow secretWord={secretWord} />
     </div>
 }
 
