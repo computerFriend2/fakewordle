@@ -33,10 +33,7 @@ const LetterRow: React.FC<LetterRowProps> = ({ secretWord }: LetterRowProps) => 
         // TODO: account for empty letter boxes
         const wordLetters = word.split('');
         wordLetters[position] = letter;
-        const newWord = wordLetters.join('');
-
-        console.log(`new word is ${newWord}`);
-        setWord(newWord);
+        setWord(wordLetters.join(''));
     }
 
     // TODO: find a way to combine all letterboxes into one textbox input, using CSS magic to make grid appearance - bc this current approach is really inefficient
