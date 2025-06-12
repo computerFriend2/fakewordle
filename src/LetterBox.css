@@ -1,20 +1,12 @@
-.letterRow {
-    border-width: 1px;
-}
-
 .letterBox {
-    height: 1em;
-    width: 1em;
+    height: 48px;
+    width: 48px;
     border: solid #888;
-    border-width: 4px 2px;
+    border-width: 2px 2px;
     margin: 0px;
     font-size: 48px;
     text-align: center;
     text-transform: uppercase;
-}
-
-.letterGrid {
-    border: 0px 2px solid #888;
 }
 
 /* styling TODO: add extra border for first and last letters */
