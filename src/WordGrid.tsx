@@ -1,5 +1,5 @@
 import LetterRow from './LetterRow'
-import chooseSecretWord from './WordGrid';
+import chooseSecretWord from './wordGridFxns';
 
 const secretWord = chooseSecretWord();
 
