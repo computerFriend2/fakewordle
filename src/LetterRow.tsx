@@ -5,34 +5,30 @@
 import { useState } from "react";
 import LetterBox from "./LetterBox";
 // import FiveLetterWords from "./word-lists/FiveLetters";
-import evaluateGuess from "./guessEval";
 
 interface LetterRowProps {
-    secretWord: string
+    sendGuess: (arg: string) => void // probably gonna set some return values
+    locked: boolean
+    letterColors: string[]
 }
-const LetterRow: React.FC<LetterRowProps> = ({ secretWord }: LetterRowProps) => {
+
+const LetterRow: React.FC<LetterRowProps> = ({ sendGuess, locked, letterColors }: LetterRowProps) => {
 
     // NOTE: this will be helpful when making the length dynamic, and also making the letter boxes dynamic vs. explicit definitions
     const WORD_LENGTH = 5;
 
     const [firstLetter, setFirstLetter] = useState<string>('');
-    const [secondLetter, setSecondLetter] = useState<string>('');
-    const [thirdLetter, setThirdLetter] = useState<string>('');
-    const [fourthLetter, setFourthLetter] = useState<string>('');
-    const [fifthLetter, setFifthLetter] = useState<string>('');
+    // const [secondLetter, setSecondLetter] = useState<string>('');
+    // const [thirdLetter, setThirdLetter] = useState<string>('');
+    // const [fourthLetter, setFourthLetter] = useState<string>('');
+    // const [fifthLetter, setFifthLetter] = useState<string>('');
 
     const [word, setWord] = useState('');
-    const [locked, setLocked] = useState<boolean>(false);
 
     const [wordError, setWordError] = useState<string>('');
     const [hasError, setHasError] = useState<boolean>(false);
 
-    const [isCorrect, setIsCorrect] = useState<boolean>(false);
-
-    const [letterStati, setLetterStati] = useState<string[]>([''])
-
     const updateWord = (letter: string, position: number): void => {
-        // TODO: account for empty letter boxes
         const wordLetters = word.split('');
         wordLetters[position] = letter;
         setWord(wordLetters.join(''));
@@ -61,41 +57,20 @@ const LetterRow: React.FC<LetterRowProps> = ({ secretWord }: LetterRowProps) => 
         updateWord(letter, 4);
     }
 
-    function validateGuess(word: string): boolean {
-        console.log("Validating guess...");
+    function submitGuess(word: string): void {
+        // only submit the guess if it's a valid input
         if (word.length < WORD_LENGTH) {
             setWordError('Not enough letters');
             setHasError(true);
-            return false;
             // re-add word validation when I have a better word list or a better way of checking
             // } else if (!FiveLetterWords.includes(word)) {
             //     setWordError('Not found in word list');
             //     setHasError(true);
-            //     return false;
         } else { // valid guess
             setHasError(false);
-            // evaluate guess
-            return true;
+            // send guess out for scoring
+            sendGuess(word);
         }
-    }
-
-
-    // TODO: move to a control component / different file?
-    function submitGuess(word: string): void {
-        const isValid: boolean = validateGuess(word);
-        if (isValid) {
-            // if a valid guess is submitted, lock the input and analyze the guess
-            setLocked(true);
-            const guessEval = evaluateGuess(word, secretWord);
-            setLetterStati(guessEval.colors);
-            console.log(`guessed: \'${word}\'`);
-            // TODO: handle correct guess status with state instead? pass handler fxn to evaluateGuess fxn? that way there's not this extra passing
-            if (guessEval.correct === true) {
-                setIsCorrect(true);
-                // TODO find a way to lock any remaining letter rows
-                // (would need to do this from WordGrid... should probably move a lot of state handling to WordGrid...)
-            }
-        };
     }
 
     function keyDownHandler(event: React.KeyboardEvent<HTMLInputElement>): void {
@@ -108,15 +83,15 @@ const LetterRow: React.FC<LetterRowProps> = ({ secretWord }: LetterRowProps) => 
     const letterRow =
         <div>
             <div onKeyDown={keyDownHandler}>
-                <LetterBox letter={firstLetter} updateLetter={updateFirstLetter} locked={locked} letterStatus={letterStati[0]}></LetterBox>
-                <LetterBox letter={secondLetter} updateLetter={updateSecondLetter} locked={locked} letterStatus={letterStati[1]}></LetterBox>
-                <LetterBox letter={thirdLetter} updateLetter={updateThirdLetter} locked={locked} letterStatus={letterStati[2]}></LetterBox>
-                <LetterBox letter={fourthLetter} updateLetter={updateFourthLetter} locked={locked} letterStatus={letterStati[3]}></LetterBox>
-                <LetterBox letter={fifthLetter} updateLetter={updateFifthLetter} locked={locked} letterStatus={letterStati[4]}></LetterBox>
+                <LetterBox letter={firstLetter} updateLetter={updateFirstLetter} locked={locked} letterStatus={letterColors[0]}></LetterBox>
+                {/* <LetterBox letter={secondLetter} updateLetter={updateSecondLetter} locked={locked} letterStatus={letterColors[1]}></LetterBox>
+                <LetterBox letter={thirdLetter} updateLetter={updateThirdLetter} locked={locked} letterStatus={letterColors[2]}></LetterBox>
+                <LetterBox letter={fourthLetter} updateLetter={updateFourthLetter} locked={locked} letterStatus={letterColors[3]}></LetterBox>
+                <LetterBox letter={fifthLetter} updateLetter={updateFifthLetter} locked={locked} letterStatus={letterColors[4]}></LetterBox> */}
             </div>
             {hasError == true ? <div className='errorText'>{wordError}</div> : ''}
             {/* TODO make this a card class (or just not a plain div), and move it to WordGrid or app level */}
-            {isCorrect == true ? <div>Congratulations, that is correct!</div> : ''}
+            {/* {isCorrect == true ? <div>Congratulations, that is correct!</div> : ''} */}
         </div >;
 
     return letterRow;
