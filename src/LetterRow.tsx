@@ -61,7 +61,7 @@ const LetterRow: React.FC<LetterRowProps> = ({ secretWord }: LetterRowProps) => 
     }
 
     // listen for Enter key at the div level
-    function keyDownHandler(event: React.KeyboardEvent<HTMLInputElement>): void {
+    function topLevelKeyboardHandler(event: React.KeyboardEvent<HTMLInputElement>): void {
         if (event.code === 'Enter') {
             submitGuess(word);
         }
@@ -69,12 +69,8 @@ const LetterRow: React.FC<LetterRowProps> = ({ secretWord }: LetterRowProps) => 
     }
 
     const keyboardHandler = (event: React.KeyboardEvent<HTMLInputElement>): void => {
-        // TODO: input validation: letters only; set error if not
-
         if (event.code === 'Enter' || event.code === 'Tab') return;
-
         const currentElement = document.activeElement;
-
         // TODO: fix focus redirect for first letter
         if ((event.code === 'ArrowLeft' || event.code === 'Backspace')) {
             if (currentElement?.previousElementSibling) {
@@ -82,14 +78,48 @@ const LetterRow: React.FC<LetterRowProps> = ({ secretWord }: LetterRowProps) => 
             }
         } else {
             (currentElement?.nextElementSibling as HTMLElement).focus();
-
         }
+    }
+
+    const onLetterChange = (event: { target: { value: SetStateAction<string>; }; }): void => {
+        // make sure it's a letter
+        if ((event.target.value as string).match(/[^a-zA-Z]/g)) {
+            console.log(`letter error for value ${event.target.value}`);
+            setHasError(true);
+            setWordError("Input must be a letter");
+        } else {
+            // clear errors on new input
+            setHasError(false);
+        }
+        const id = document.activeElement?.id;
+        if (id) {
+            switch (id) {
+                case '0':
+                    updateFirstLetter(event.target.value as string);
+                    break;
+                case '1':
+                    updateSecondLetter(event.target.value as string); break;
+
+                case '2':
+                    updateThirdLetter(event.target.value as string); break;
+
+                case '3':
+                    updateFourthLetter(event.target.value as string); break;
+
+                case '4':
+                    updateFifthLetter(event.target.value as string); break;
+                default:
+                    console.error(`LetterBox missing id`)
+            }
+        }
+
     }
 
     const focusNextRow = (): void => {
         // take the active element's parent (row) and then focus next sibling
+        // rows are double-nested in divs (to bundle error msgs at the bottom) so you have to go up and down twice
         const activeRow = (document.activeElement?.parentElement);
-        (activeRow?.nextElementSibling?.firstElementChild as HTMLElement).focus();
+        (activeRow?.parentElement?.nextElementSibling?.firstElementChild?.firstElementChild as HTMLElement).focus();
     }
 
     function validateGuess(word: string): boolean {
@@ -131,36 +161,22 @@ const LetterRow: React.FC<LetterRowProps> = ({ secretWord }: LetterRowProps) => 
     }
 
     const letterRow =
-        <div onKeyDown={keyDownHandler}>
-            {/* <LetterBox letter={firstLetter} updateLetter={updateFirstLetter} locked={locked} letterColor={letterColors[0]}></LetterBox>
-                <LetterBox letter={secondLetter} updateLetter={updateSecondLetter} locked={locked} letterColor={letterColors[1]}></LetterBox>
-                <LetterBox letter={thirdLetter} updateLetter={updateThirdLetter} locked={locked} letterColor={letterColors[2]}></LetterBox>
-                <LetterBox letter={fourthLetter} updateLetter={updateFourthLetter} locked={locked} letterColor={letterColors[3]}></LetterBox>
-                <LetterBox letter={fifthLetter} updateLetter={updateFifthLetter} locked={locked} letterColor={letterColors[4]}></LetterBox> */}
-            <input type="text" className={'letterBox ' + letterColors[0]} disabled={locked} onKeyUp={keyboardHandler}
-                maxLength={1} value={firstLetter} onChange={(event: { target: { value: SetStateAction<string>; }; }) => {
-                    updateFirstLetter(event.target.value as string);
-                }}></input>
-            <input type="text" className={'letterBox ' + letterColors[1]} disabled={locked} onKeyUp={keyboardHandler}
-                maxLength={1} value={secondLetter} onChange={(event: { target: { value: SetStateAction<string>; }; }) => {
-                    updateSecondLetter(event.target.value as string);
-                }}></input>
-            <input type="text" className={'letterBox ' + letterColors[2]} disabled={locked} onKeyUp={keyboardHandler}
-                maxLength={1} value={thirdLetter} onChange={(event: { target: { value: SetStateAction<string>; }; }) => {
-                    updateThirdLetter(event.target.value as string);
-                }}></input>
-            <input type="text" className={'letterBox ' + letterColors[3]} disabled={locked} onKeyUp={keyboardHandler}
-                maxLength={1} value={fourthLetter} onChange={(event: { target: { value: SetStateAction<string>; }; }) => {
-                    updateFourthLetter(event.target.value as string);
-                }}></input>
-            <input type="text" className={'letterBox ' + letterColors[4]} disabled={locked} onKeyUp={keyboardHandler}
-                maxLength={1} value={fifthLetter} onChange={(event: { target: { value: SetStateAction<string>; }; }) => {
-                    updateFifthLetter(event.target.value as string);
-                }}></input>
+        <div onKeyDown={topLevelKeyboardHandler}>
+            <div>
+                <input type="text" id={'0'} className={'letterBox ' + letterColors[0]} disabled={locked} onKeyUp={keyboardHandler}
+                    maxLength={1} value={firstLetter} onChange={onLetterChange}></input>
+                <input type="text" id={'1'} className={'letterBox ' + letterColors[1]} disabled={locked} onKeyUp={keyboardHandler}
+                    maxLength={1} value={secondLetter} onChange={onLetterChange}></input>
+                <input type="text" id={'2'} className={'letterBox ' + letterColors[2]} disabled={locked} onKeyUp={keyboardHandler}
+                    maxLength={1} value={thirdLetter} onChange={onLetterChange}></input>
+                <input type="text" id={'3'} className={'letterBox ' + letterColors[3]} disabled={locked} onKeyUp={keyboardHandler}
+                    maxLength={1} value={fourthLetter} onChange={onLetterChange}></input>
+                <input type="text" id={'4'} className={'letterBox ' + letterColors[4]} disabled={locked} onKeyUp={keyboardHandler}
+                    maxLength={1} value={fifthLetter} onChange={onLetterChange}></input>
+            </div>
+            {hasError == true ? <div className='errorText'>{wordError}</div> : ''}
+            {isCorrect == true ? <div>Congratulations, that is correct!</div> : ''}
         </div>
-    {/* TODO: move both of these to the WordGrid level */ }
-    // { hasError == true ? <div className='errorText'>{wordError}</div> : '' }
-    // { isCorrect == true ? <div>Congratulations, that is correct!</div> : '' }
 
     return letterRow;
 }
