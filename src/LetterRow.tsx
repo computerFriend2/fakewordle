@@ -2,7 +2,7 @@
 // TODO: auto-focus to the next box after inputting letter
 // TODO: enable backspace (would seriously be easier to just use a text input...)
 
-import { useState } from "react";
+import { useState, type SetStateAction } from "react";
 import LetterBox from "./LetterBox";
 // import FiveLetterWords from "./word-lists/FiveLetters";
 import evaluateGuess from "./guessEval";
@@ -29,7 +29,7 @@ const LetterRow: React.FC<LetterRowProps> = ({ secretWord }: LetterRowProps) => 
 
     const [isCorrect, setIsCorrect] = useState<boolean>(false);
 
-    const [letterStati, setLetterStati] = useState<string[]>([''])
+    const [letterColors, setLetterColors] = useState<string[]>([''])
 
     const updateWord = (letter: string, position: number): void => {
         // TODO: account for empty letter boxes
@@ -61,7 +61,28 @@ const LetterRow: React.FC<LetterRowProps> = ({ secretWord }: LetterRowProps) => 
         updateWord(letter, 4);
     }
 
+    const focusNextLetter = (event: React.KeyboardEvent<HTMLInputElement>): void => {
+        if (event.code === 'Enter' || event.code === 'Backspace' || event.code === 'Tab') return;
+
+        const currentElement = document.activeElement;
+
+        if (event.code === 'ArrowLeft' && currentElement?.previousElementSibling) {
+            (currentElement.previousElementSibling as HTMLElement).focus();
+        } else {
+            (currentElement?.nextElementSibling as HTMLElement).focus();
+
+        }
+    }
+
+    const focusNextRow = (): void => {
+        // take the active element's parent (row) and then focus next sibling
+        const activeRow = (document.activeElement?.parentElement);
+        (activeRow?.nextElementSibling?.firstElementChild as HTMLElement).focus();
+    }
+
     function validateGuess(word: string): boolean {
+        // TODO: only accept letters (no symbols or numbers)
+
         console.log("Validating guess...");
         if (word.length < WORD_LENGTH) {
             setWordError('Not enough letters');
@@ -79,7 +100,6 @@ const LetterRow: React.FC<LetterRowProps> = ({ secretWord }: LetterRowProps) => 
         }
     }
 
-
     // TODO: move to a control component / different file?
     function submitGuess(word: string): void {
         const isValid: boolean = validateGuess(word);
@@ -87,13 +107,13 @@ const LetterRow: React.FC<LetterRowProps> = ({ secretWord }: LetterRowProps) => 
             // if a valid guess is submitted, lock the input and analyze the guess
             setLocked(true);
             const guessEval = evaluateGuess(word, secretWord);
-            setLetterStati(guessEval.colors);
-            console.log(`guessed: \'${word}\'`);
-            // TODO: handle correct guess status with state instead? pass handler fxn to evaluateGuess fxn? that way there's not this extra passing
+            setLetterColors(guessEval.colors);
             if (guessEval.correct === true) {
                 setIsCorrect(true);
                 // TODO find a way to lock any remaining letter rows
                 // (would need to do this from WordGrid... should probably move a lot of state handling to WordGrid...)
+            } else {
+                focusNextRow();
             }
         };
     }
@@ -106,18 +126,36 @@ const LetterRow: React.FC<LetterRowProps> = ({ secretWord }: LetterRowProps) => 
     }
 
     const letterRow =
-        <div>
-            <div onKeyDown={keyDownHandler}>
-                <LetterBox letter={firstLetter} updateLetter={updateFirstLetter} locked={locked} letterStatus={letterStati[0]}></LetterBox>
-                <LetterBox letter={secondLetter} updateLetter={updateSecondLetter} locked={locked} letterStatus={letterStati[1]}></LetterBox>
-                <LetterBox letter={thirdLetter} updateLetter={updateThirdLetter} locked={locked} letterStatus={letterStati[2]}></LetterBox>
-                <LetterBox letter={fourthLetter} updateLetter={updateFourthLetter} locked={locked} letterStatus={letterStati[3]}></LetterBox>
-                <LetterBox letter={fifthLetter} updateLetter={updateFifthLetter} locked={locked} letterStatus={letterStati[4]}></LetterBox>
-            </div>
-            {hasError == true ? <div className='errorText'>{wordError}</div> : ''}
-            {/* TODO make this a card class (or just not a plain div), and move it to WordGrid or app level */}
-            {isCorrect == true ? <div>Congratulations, that is correct!</div> : ''}
-        </div >;
+        <div onKeyDown={keyDownHandler}>
+            {/* <LetterBox letter={firstLetter} updateLetter={updateFirstLetter} locked={locked} letterColor={letterColors[0]}></LetterBox>
+                <LetterBox letter={secondLetter} updateLetter={updateSecondLetter} locked={locked} letterColor={letterColors[1]}></LetterBox>
+                <LetterBox letter={thirdLetter} updateLetter={updateThirdLetter} locked={locked} letterColor={letterColors[2]}></LetterBox>
+                <LetterBox letter={fourthLetter} updateLetter={updateFourthLetter} locked={locked} letterColor={letterColors[3]}></LetterBox>
+                <LetterBox letter={fifthLetter} updateLetter={updateFifthLetter} locked={locked} letterColor={letterColors[4]}></LetterBox> */}
+            <input type="text" className={'letterBox ' + letterColors[0]} disabled={locked} onKeyUp={focusNextLetter}
+                maxLength={1} value={firstLetter} onChange={(event: { target: { value: SetStateAction<string>; }; }) => {
+                    updateFirstLetter(event.target.value as string);
+                }}></input>
+            <input type="text" className={'letterBox ' + letterColors[1]} disabled={locked} onKeyUp={focusNextLetter}
+                maxLength={1} value={secondLetter} onChange={(event: { target: { value: SetStateAction<string>; }; }) => {
+                    updateSecondLetter(event.target.value as string);
+                }}></input>
+            <input type="text" className={'letterBox ' + letterColors[2]} disabled={locked} onKeyUp={focusNextLetter}
+                maxLength={1} value={thirdLetter} onChange={(event: { target: { value: SetStateAction<string>; }; }) => {
+                    updateThirdLetter(event.target.value as string);
+                }}></input>
+            <input type="text" className={'letterBox ' + letterColors[3]} disabled={locked} onKeyUp={focusNextLetter}
+                maxLength={1} value={fourthLetter} onChange={(event: { target: { value: SetStateAction<string>; }; }) => {
+                    updateFourthLetter(event.target.value as string);
+                }}></input>
+            <input type="text" className={'letterBox ' + letterColors[4]} disabled={locked}
+                maxLength={1} value={fifthLetter} onChange={(event: { target: { value: SetStateAction<string>; }; }) => {
+                    updateFifthLetter(event.target.value as string);
+                }}></input>
+        </div>
+    {/* TODO: move both of these to the WordGrid level */ }
+    // { hasError == true ? <div className='errorText'>{wordError}</div> : '' }
+    // { isCorrect == true ? <div>Congratulations, that is correct!</div> : '' }
 
     return letterRow;
 }
