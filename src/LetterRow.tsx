@@ -71,13 +71,12 @@ const LetterRow: React.FC<LetterRowProps> = ({ secretWord }: LetterRowProps) => 
     const keyboardHandler = (event: React.KeyboardEvent<HTMLInputElement>): void => {
         if (event.code === 'Enter' || event.code === 'Tab') return;
         const currentElement = document.activeElement;
-        // TODO: fix focus redirect for first letter
         if ((event.code === 'ArrowLeft' || event.code === 'Backspace')) {
             if (currentElement?.previousElementSibling) {
                 (currentElement.previousElementSibling as HTMLElement).focus();
             }
-        } else {
-            (currentElement?.nextElementSibling as HTMLElement).focus();
+        } else if (currentElement?.nextElementSibling) {
+            (currentElement.nextElementSibling as HTMLElement).focus();
         }
     }
 
